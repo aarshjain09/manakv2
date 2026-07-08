@@ -4,7 +4,7 @@ const router = require("express").Router();
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 const upload = require("../middleware/upload");
-const excelUpload = require("../middleware/excelUpload");
+const excelUpload = require("../middleware/excel");
 
 const productController = require("../controllers/product");
 
