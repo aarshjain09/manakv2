@@ -219,25 +219,18 @@ export default function Products() {
 
 
   /* =====================================================
-            FILTER CATEGORIES BY BRAND
+              CATEGORY IS GLOBAL
   ===================================================== */
 
-  const availableCategories = useMemo(() => {
-    if (!brandFilter) {
-      return categories;
-    }
+  /*
+    No category filtering by brand.
 
-    return categories.filter((category) => {
-      const categoryBrandId =
-        category.brand?._id ||
-        category.brand;
+    Categories are global and independent.
 
-      return (
-        String(categoryBrandId) ===
-        String(brandFilter)
-      );
-    });
-  }, [categories, brandFilter]);
+    Structure:
+    Company -> Brand
+    Category -> Global
+  */
 
 
   /* =====================================================
@@ -316,14 +309,17 @@ export default function Products() {
   const handleCompanyFilter = (e) => {
     setCompanyFilter(e.target.value);
 
+    // Brand depends on Company
     setBrandFilter("");
-    setCategoryFilter("");
+
+    // Category is global
+    // Do not reset category
   };
 
   const handleBrandFilter = (e) => {
+    // Category is global
+    // Do not reset category
     setBrandFilter(e.target.value);
-
-    setCategoryFilter("");
   };
 
   const clearFilters = () => {
@@ -1035,6 +1031,8 @@ export default function Products() {
           </select>
 
 
+          {/* GLOBAL CATEGORY FILTER */}
+
           <select
             value={categoryFilter}
             onChange={(e) =>
@@ -1046,16 +1044,14 @@ export default function Products() {
               All Categories
             </option>
 
-            {availableCategories.map(
-              (category) => (
-                <option
-                  key={category._id}
-                  value={category._id}
-                >
-                  {category.name}
-                </option>
-              )
-            )}
+            {categories.map((category) => (
+              <option
+                key={category._id}
+                value={category._id}
+              >
+                {category.name}
+              </option>
+            ))}
           </select>
 
         </div>

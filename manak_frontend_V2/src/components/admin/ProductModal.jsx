@@ -1,4 +1,6 @@
+
 import { useEffect, useMemo, useState } from "react";
+
 import {
   X,
   Package,
@@ -144,6 +146,13 @@ export default function ProductModal({
                     FILTER BRANDS
   ===================================================== */
 
+  /*
+    Brand depends on Company.
+
+    Structure:
+    Company -> Brand
+  */
+
   const filteredBrands = useMemo(() => {
     if (!formData.company) {
       return [];
@@ -162,27 +171,19 @@ export default function ProductModal({
   }, [brands, formData.company]);
 
   /* =====================================================
-                  FILTER CATEGORIES
+                    GLOBAL CATEGORIES
   ===================================================== */
 
-  const filteredCategories = useMemo(() => {
-    if (!formData.brand) {
-      return [];
-    }
+  /*
+    Categories are global.
 
-    return categories.filter(
-      (category) => {
-        const categoryBrandId =
-          category.brand?._id ||
-          category.brand;
+    They do NOT depend on:
+    - Company
+    - Brand
 
-        return (
-          String(categoryBrandId) ===
-          String(formData.brand)
-        );
-      }
-    );
-  }, [categories, formData.brand]);
+    So we directly use:
+    categories
+  */
 
   /* =====================================================
                     HANDLE CHANGE
@@ -196,26 +197,43 @@ export default function ProductModal({
       checked,
     } = e.target;
 
+    /* ================= COMPANY CHANGE ================= */
+
     if (name === "company") {
       setFormData((prev) => ({
         ...prev,
+
         company: value,
+
+        // Brand depends on company,
+        // therefore reset brand.
         brand: "",
-        category: "",
+
+        // Category is global,
+        // therefore preserve category.
+        category: prev.category,
       }));
 
       return;
     }
+
+    /* ================= BRAND CHANGE ================= */
 
     if (name === "brand") {
       setFormData((prev) => ({
         ...prev,
+
         brand: value,
-        category: "",
+
+        // Category is global,
+        // therefore preserve category.
+        category: prev.category,
       }));
 
       return;
     }
+
+    /* ================= NORMAL CHANGE ================= */
 
     setFormData((prev) => ({
       ...prev,
@@ -497,11 +515,11 @@ export default function ProductModal({
 
               <div className="mb-5">
                 <h3 className="text-lg font-semibold text-slate-800">
-                  Product Hierarchy
+                  Product Classification
                 </h3>
 
                 <p className="text-sm text-slate-500 mt-1">
-                  Select company, brand and category
+                  Select company, its brand, and a global category
                 </p>
               </div>
 
@@ -576,7 +594,7 @@ export default function ProductModal({
 
                 </div>
 
-                {/* Category */}
+                {/* GLOBAL CATEGORY */}
 
                 <div>
 
@@ -588,18 +606,13 @@ export default function ProductModal({
                     name="category"
                     value={formData.category}
                     onChange={handleChange}
-                    disabled={
-                      !formData.brand
-                    }
-                    className="w-full h-12 border rounded-xl px-4 focus:ring-2 focus:ring-primary outline-none bg-white disabled:bg-slate-100 disabled:text-slate-400"
+                    className="w-full h-12 border rounded-xl px-4 focus:ring-2 focus:ring-primary outline-none bg-white"
                   >
                     <option value="">
-                      {formData.brand
-                        ? "Select Category"
-                        : "Select Brand First"}
+                      Select Category
                     </option>
 
-                    {filteredCategories.map(
+                    {categories.map(
                       (category) => (
                         <option
                           key={category._id}
@@ -635,16 +648,12 @@ export default function ProductModal({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
 
-                {/* MRP */}
-
                 <PriceInput
                   label="MRP *"
                   name="mrp"
                   value={formData.mrp}
                   onChange={handleChange}
                 />
-
-                {/* Price A */}
 
                 <PriceInput
                   label="Price A *"
@@ -653,8 +662,6 @@ export default function ProductModal({
                   onChange={handleChange}
                 />
 
-                {/* Price B */}
-
                 <PriceInput
                   label="Price B *"
                   name="priceB"
@@ -662,16 +669,12 @@ export default function ProductModal({
                   onChange={handleChange}
                 />
 
-                {/* Price C */}
-
                 <PriceInput
                   label="Price C *"
                   name="priceC"
                   value={formData.priceC}
                   onChange={handleChange}
                 />
-
-                {/* Margin */}
 
                 <div>
 
@@ -723,8 +726,6 @@ export default function ProductModal({
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
-                {/* Pieces Per Box */}
-
                 <div>
 
                   <label className="block mb-2 font-medium text-slate-700">
@@ -753,8 +754,6 @@ export default function ProductModal({
 
                 </div>
 
-                {/* Stock Boxes */}
-
                 <div>
 
                   <label className="block mb-2 font-medium text-slate-700">
@@ -782,8 +781,6 @@ export default function ProductModal({
                   </div>
 
                 </div>
-
-                {/* Stock Pieces */}
 
                 <div>
 
@@ -868,8 +865,6 @@ export default function ProductModal({
                 </p>
               </div>
 
-              {/* Display Order */}
-
               <div className="mb-6 max-w-sm">
 
                 <label className="block mb-2 font-medium text-slate-700">
@@ -888,8 +883,6 @@ export default function ProductModal({
                 />
 
               </div>
-
-              {/* Image */}
 
               <div>
 
@@ -1029,3 +1022,4 @@ function PriceInput({
     </div>
   );
 }
+
