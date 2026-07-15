@@ -34,8 +34,11 @@ export default function CategoryProducts() {
 
   const location = useLocation();
 
-  const category =
-    location.state?.category;
+const category =
+  location.state?.category;
+
+const brand =
+  location.state?.brand;
 
   const {
     cart,
@@ -80,12 +83,32 @@ export default function CategoryProducts() {
             ? res.data.data
             : [];
 
-        setProducts(
-          data.filter(
-            (product) =>
-              product.isActive !== false
-          )
-        );
+        const filteredProducts = data.filter(
+  (product) => {
+    // Ignore inactive products
+    if (product.isActive === false) {
+      return false;
+    }
+
+    // If brand was selected, keep only that brand's products
+    if (brand?._id) {
+      const productBrandId =
+        product.brand?._id ||
+        product.brand;
+
+      if (
+        String(productBrandId) !==
+        String(brand._id)
+      ) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+);
+
+setProducts(filteredProducts);
       } catch (err) {
         console.error(
           "Failed to load category products:",
